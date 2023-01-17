@@ -1,0 +1,39 @@
+#usda 1.0
+(
+    defaultPrim = "box_uv"
+    endTimeCode = 1
+    framesPerSecond = 24
+    metersPerUnit = 1
+    startTimeCode = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "box_uv" (
+    kind = "component"
+)
+{
+    matrix4d xformOp:transform:xform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform:xform"]
+
+    def Mesh "mesh_0"
+    {
+        float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 4, 5, 7, 6, 6, 7, 2, 3, 5, 4, 1, 0, 5, 0, 2, 7, 1, 4, 6, 3]
+        uniform token orientation = "leftHanded"
+        point3f[] points = [(0.5, -0.5, 0.5), (-0.5, -0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, 0.5, 0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (-0.5, 0.5, -0.5), (0.5, 0.5, -0.5)] (
+            interpolation = "vertex"
+        )
+        float primvars:coverage = 0.66094995
+        int[] primvars:coverage:indices = None
+        int primvars:numnonpacked = 0
+        int[] primvars:numnonpacked:indices = None
+        texCoord2f[] primvars:st = [(0.3330078, 0), (0.3330078, 0.33190107), (0.6649089, 0.33190107), (0.6649089, 0), (0.9979167, 0), (0.6660156, 0), (0.6660156, 0.33190107), (0.9979167, 0.33190107), (0.3330078, 0.6649089), (0.6649089, 0.6649089), (0.6649089, 0.3330078), (0.3330078, 0.3330078), (0.3319011, 0.3330078), (0, 0.3330078), (0, 0.6649089), (0.3319011, 0.6649089), (0.9979167, 0.3330078), (0.6660156, 0.3330078), (0.6660156, 0.6649089), (0.9979167, 0.6649089), (0.3319011, 0), (0, 0), (0, 0.3319011), (0.3319011, 0.3319011)] (
+            interpolation = "faceVarying"
+        )
+        int[] primvars:st:indices = None
+        uniform token subdivisionScheme = "none"
+    }
+}
+

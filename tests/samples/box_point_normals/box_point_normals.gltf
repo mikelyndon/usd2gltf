@@ -1,0 +1,54 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 8,
+      "type": "VEC3",
+      "max": [0.5, 0.5, 0.5],
+      "min": [-0.5, -0.5, -0.5]
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 0,
+      "componentType": 5123,
+      "count": 36,
+      "type": "SCALAR",
+      "max": [7],
+      "min": [0]
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 8,
+      "type": "VEC3",
+      "max": [0.5773502691896257, 0.5773502691896257, 0.5773502691896257],
+      "min": [-0.5773502691896257, -0.5773502691896257, -0.5773502691896257]
+    }
+  ],
+  "asset": { "version": "2.0" },
+  "buffers": [{ "uri": "geometry.bin", "byteLength": 264 }],
+  "bufferViews": [
+    { "buffer": 0, "byteOffset": 0, "byteLength": 96, "target": 34962 },
+    { "buffer": 0, "byteOffset": 96, "byteLength": 72, "target": 34963 },
+    { "buffer": 0, "byteOffset": 168, "byteLength": 96, "target": 34962 }
+  ],
+  "meshes": [
+    {
+      "name": "mesh_0",
+      "primitives": [
+        { "attributes": { "POSITION": 0, "NORMAL": 2 }, "indices": 1 }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "box_point_normals",
+      "children": [1]
+    },
+    { "name": "mesh_0", "mesh": 0 }
+  ],
+  "scenes": [{ "nodes": [0] }]
+}

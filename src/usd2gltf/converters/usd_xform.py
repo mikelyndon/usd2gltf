@@ -1,14 +1,10 @@
-from pxr import UsdGeom
-
-import struct
-import operator
-
-from gltflib import *
+from gltflib import (GLTF, Node)
 
 from usd2gltf import common
 import logging
 
 logger = logging.getLogger(__name__)
+
 
 def convert(converter, usd_xform):
     node_id = len(converter.gltfDoc.nodes)

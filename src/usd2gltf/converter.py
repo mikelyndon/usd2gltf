@@ -1,108 +1,100 @@
 from pxr import Usd, UsdGeom
-
 import zipfile
 import tempfile
 import os
-
-from gltflib import *
-
+from gltflib import GLTF, GLTFModel, Asset, Buffer, FileResource, Scene
 import logging
-logging.basicConfig(level=logging.DEBUG)
-
-logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
-
 from usd2gltf import common
 from pathlib import Path
-
-from pprint import pprint
-
 from usd2gltf.converters import usd_mesh, usd_xform
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
 class Converter:
-    used_images = []
-
-    # Settings
-    interpolation = "LINEAR"
-
-    convert_meshes = True
-    convert_normals = True
-    convert_texcoords = True
-    convert_colors = True
-    normalize_normals = True
-    use_mesh_indices = True
-
-    convert_xform_animation = True
-    convert_skinned_animation = True
-
-    convert_materials = True
-    convert_instancers = True
-    convert_hierarchy = True
-
-    flatten_xform_animation = False
-
-    normalize_weights = True
-
-    maindata_bytearray = bytearray()
-    # TODO: Remove these
-    currentByteOffset = 0
-    totalByteLen = 0
-
-    animated_xforms_bytearray = bytearray()
-    ibt_bytearray = bytearray()
-
-    animated_xforms_bufferview_id = -1
-    animated_xforms_bufferview = None
-
-    # Components
-    animations = {}
-    textures = []
-    images = []
-    materials = []
-    skins = []
-    cameras = []
-    bufferViews = []
-    lights = []
-    texts = []
-    samplers = []
-
-    # Root nodes
-    nodes = []
-
-    nodeMap = {}        # Primpath -> gltf node
-    heirachyMap = {}    # Primpath -> node id
-
-    textureMap = {}     # filepath -> texture id
-    materialMap = {}    # Primpath -> material_id
-
-    joint_map = {}      # [skelpath] joint -> (node id, node)
-    skin_map = {}       # skinpath -> (skin_id, gltfSkin)
-    mesh_map = {}       # primpath -> (mesh_id, gltfMesh)
-    skeleton_map = {}   # [skeleton][scene_id] -> skeleton joint id
-    text_map = {}       # primpath -> (text_id, gltfText)
-
-    # Need to track which TEXCOORD_X to use with 2 uvsets
-    # Probably a better way to handle this. Tricky because
-    # materials handled before uv primvars. It should probably
-    # be the reverse
-    material_uv_indices = {}  # Primpath -> uv_name -> uv_index
-
-    is_glb = True
-
-    resources = []
-
-    temp_dir = None
-
-    # USD
-    stage = None
-    FPS = 24.0
-
-    # glTF
-    gltfDoc = None
-
     def __init__(self):
         self.temp_dir = tempfile.TemporaryDirectory()
+        self.used_images = []
+
+        # Settings
+        self.interpolation = "LINEAR"
+
+        self.convert_meshes = True
+        self.convert_normals = True
+        self.convert_texcoords = True
+        self.convert_colors = True
+        self.normalize_normals = True
+        self.use_mesh_indices = True
+
+        self.convert_xform_animation = True
+        self.convert_skinned_animation = True
+
+        self.convert_materials = True
+        self.convert_instancers = True
+        self.convert_hierarchy = True
+
+        self.flatten_xform_animation = False
+
+        self.normalize_weights = True
+
+        self.maindata_bytearray = bytearray()
+        # TODO: Remove these
+        self.currentByteOffset = 0
+        self.totalByteLen = 0
+
+        self.animated_xforms_bytearray = bytearray()
+        self.ibt_bytearray = bytearray()
+
+        self.animated_xforms_bufferview_id = -1
+        self.animated_xforms_bufferview = None
+
+        # Components
+        self.animations = {}
+        self.textures = []
+        self.images = []
+        self.materials = []
+        self.skins = []
+        self.cameras = []
+        self.bufferViews = []
+        self.lights = []
+        self.texts = []
+        self.samplers = []
+
+        # Root nodes
+        self.nodes = []
+
+        self.nodeMap = {}  # Primpath -> gltf node
+        self.heirachyMap = {}  # Primpath -> node id
+
+        self.textureMap = {}  # filepath -> texture id
+        self.materialMap = {}  # Primpath -> material_id
+
+        self.joint_map = {}  # [skelpath] joint -> (node id, node)
+        self.skin_map = {}  # skinpath -> (skin_id, gltfSkin)
+        self.mesh_map = {}  # primpath -> (mesh_id, gltfMesh)
+        self.skeleton_map = {}  # [skeleton][scene_id] -> skeleton joint id
+        self.text_map = {}  # primpath -> (text_id, gltfText)
+
+        # Need to track which TEXCOORD_X to use with 2 uvsets
+        # Probably a better way to handle this. Tricky because
+        # materials handled before uv primvars. It should probably
+        # be the reverse
+        self.material_uv_indices = {}  # Primpath -> uv_name -> uv_index
+
+        self.is_glb = True
+
+        self.resources = []
+
+        # USD
+        self.stage = None
+        self.FPS = 24.0
+
+        # glTF
+        self.gltfDoc = None
+        
         logger.debug("Created converter")
+
 
     def _traverse(self, prim):
         children = prim.nameChildren
@@ -150,21 +142,21 @@ class Converter:
 
         logger.debug("== Stage Contents ==")
 
-        self.is_glb = outputGLTF.endswith('.glb')
+        self.is_glb = outputGLTF.endswith(".glb")
 
         self.stage = stage
 
         self.FPS = self.stage.GetFramesPerSecond()
 
         self.gltfDoc = GLTFModel(
-            asset=Asset(version='2.0'),
+            asset=Asset(version="2.0"),
             scenes=[],
             nodes=[],
             meshes=[],
             buffers=[],
             bufferViews=[],
             accessors=[],
-            extensions={},
+            # extensions={},
         )
 
         # Primitive Ingestion
@@ -173,7 +165,6 @@ class Converter:
         def traversePrims(parent, parent_vis=True):
             for prim in parent.GetAllChildren():
 
-                pname = prim.GetName()
                 ppath = prim.GetPrimPath()
                 logger.debug("prim: {}".format(ppath))
 
@@ -181,21 +172,18 @@ class Converter:
                 node_id = -1
 
                 is_visible = parent_vis
-                is_pi_prototype = False
 
                 # Handle transforms
                 if prim.IsA(UsdGeom.Xformable) and is_visible:
-                    node_id, gltfNode = usd_xform.convert(self,
-                                                          UsdGeom.Xformable(prim))
-                    gltfNode.extensions = {}
+                    node_id, gltfNode = usd_xform.convert(self, UsdGeom.Xformable(prim))
+                    # gltfNode.extensions = {}
 
                     self.heirachyMap[ppath] = node_id
                     self.nodeMap[ppath] = gltfNode
 
                 # Handle meshes
                 if prim.IsA(UsdGeom.Mesh):
-                    mesh_id, gltfMesh = usd_mesh.convert(
-                        self, UsdGeom.Mesh(prim))
+                    mesh_id, gltfMesh = usd_mesh.convert(self, UsdGeom.Mesh(prim))
 
                     if not gltfMesh:
                         continue
@@ -237,22 +225,27 @@ class Converter:
             self.gltfDoc.samplers = self.samplers
 
         # Buffer data
-
-        self.gltfDoc.buffers.append(Buffer(byteLength=len(
-            self.maindata_bytearray), uri='geometry.bin'))
-        self.resources.append(FileResource(
-            'geometry.bin', data=self.maindata_bytearray))
+        self.gltfDoc.buffers.append(
+            Buffer(byteLength=len(self.maindata_bytearray), uri="geometry.bin")
+        )
+        self.resources.append(
+            FileResource("geometry.bin", data=self.maindata_bytearray)
+        )
 
         if len(self.animations) > 0:
-            self.gltfDoc.buffers.append(Buffer(byteLength=len(
-                self.animated_xforms_bytearray), uri='animation.bin'))
-            self.resources.append(FileResource(
-                'animation.bin', data=self.animated_xforms_bytearray))
+            self.gltfDoc.buffers.append(
+                Buffer(
+                    byteLength=len(self.animated_xforms_bytearray), uri="animation.bin"
+                )
+            )
+            self.resources.append(
+                FileResource("animation.bin", data=self.animated_xforms_bytearray)
+            )
 
-        self.gltfDoc.buffers.append(Buffer(byteLength=len(
-            self.ibt_bytearray), uri='bindTransforms.bin'))
-        self.resources.append(FileResource(
-            'bindTransforms.bin', data=self.ibt_bytearray))
+        # self.gltfDoc.buffers.append(Buffer(byteLength=len(
+        #     self.ibt_bytearray), uri='bindTransforms.bin'))
+        # self.resources.append(FileResource(
+        # 'bindTransforms.bin', data=self.ibt_bytearray))
 
         # Add scene
 
@@ -273,6 +266,4 @@ class Converter:
         try:
             self.temp_dir.cleanup()
         except Exception as e:
-            pass
-
-
+            logger.error(e)

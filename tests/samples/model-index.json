@@ -1,0 +1,47 @@
+[
+  {
+    "name": "box",
+    "inputs": {
+      "usda": "box.usda"
+    },
+    "outputs": {
+      "gltf": "box.gltf"
+    }
+  },
+  {
+    "name": "box_vertex_normals",
+    "inputs": {
+      "usda": "box_vertex_normals.usda"
+    },
+    "outputs": {
+      "gltf": "box_vertex_normals.gltf"
+    }
+  },
+  {
+    "name": "box_point_normals",
+    "inputs": {
+      "usda": "box_point_normals.usda"
+    },
+    "outputs": {
+      "gltf": "box_point_normals.gltf"
+    }
+  },
+  {
+    "name": "box_subset",
+    "inputs": {
+      "usda": "box_subset.usda"
+    },
+    "outputs": {
+      "gltf": "box_subset.gltf"
+    }
+  },
+  {
+    "name": "transform_and_box",
+    "inputs": {
+      "usda": "transform_and_box.usda"
+    },
+    "outputs": {
+      "gltf": "transform_and_box.gltf"
+    }
+  }
+]
