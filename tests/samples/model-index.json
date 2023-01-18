@@ -43,5 +43,23 @@
     "outputs": {
       "gltf": "transform_and_box.gltf"
     }
+  },
+  {
+    "name": "box_vertex_color",
+    "inputs": {
+      "usda": "box_vertex_color.usda"
+    },
+    "outputs": {
+      "gltf": "box_vertex_color.gltf"
+    }
+  },
+  {
+    "name": "box_point_color",
+    "inputs": {
+      "usda": "box_point_color.usda"
+    },
+    "outputs": {
+      "gltf": "box_point_color.gltf"
+    }
   }
 ]

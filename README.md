@@ -7,6 +7,7 @@ Current version `0.0.1`
 
 * usd-core (Or custom Pixar USD build)
 * gltflib
+* numpy
 
 ## Features
 

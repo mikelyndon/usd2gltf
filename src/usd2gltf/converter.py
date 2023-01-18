@@ -92,9 +92,8 @@ class Converter:
 
         # glTF
         self.gltfDoc = None
-        
-        logger.debug("Created converter")
 
+        logger.debug("Created converter")
 
     def _traverse(self, prim):
         children = prim.nameChildren
@@ -158,6 +157,8 @@ class Converter:
             accessors=[],
             # extensions={},
         )
+
+        basename_without_ext = os.path.splitext(os.path.basename(outputGLTF))[0]
 
         # Primitive Ingestion
         logger.debug("Primitives: ")
@@ -226,20 +227,30 @@ class Converter:
 
         # Buffer data
         self.gltfDoc.buffers.append(
-            Buffer(byteLength=len(self.maindata_bytearray), uri="geometry.bin")
+            Buffer(
+                byteLength=len(self.maindata_bytearray),
+                uri="{}_geometry.bin".format(basename_without_ext),
+            )
         )
         self.resources.append(
-            FileResource("geometry.bin", data=self.maindata_bytearray)
+            FileResource(
+                "{}_geometry.bin".format(basename_without_ext),
+                data=self.maindata_bytearray,
+            )
         )
 
         if len(self.animations) > 0:
             self.gltfDoc.buffers.append(
                 Buffer(
-                    byteLength=len(self.animated_xforms_bytearray), uri="animation.bin"
+                    byteLength=len(self.animated_xforms_bytearray),
+                    uri="{}_animation.bin".format(basename_without_ext),
                 )
             )
             self.resources.append(
-                FileResource("animation.bin", data=self.animated_xforms_bytearray)
+                FileResource(
+                    "{}_animation.bin".format(basename_without_ext),
+                    data=self.animated_xforms_bytearray,
+                )
             )
 
         # self.gltfDoc.buffers.append(Buffer(byteLength=len(
