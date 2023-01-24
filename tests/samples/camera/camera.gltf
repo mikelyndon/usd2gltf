@@ -1,0 +1,77 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 36,
+      "type": "SCALAR",
+      "max": [35],
+      "min": [0]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3",
+      "max": [0.5, 0.5, 0.5],
+      "min": [-0.5, -0.5, -0.5]
+    }
+  ],
+  "asset": { "version": "2.0" },
+  "buffers": [{ "uri": "camera_geometry.bin", "byteLength": 576 }],
+  "bufferViews": [
+    { "buffer": 0, "byteOffset": 0, "byteLength": 144, "target": 34963 },
+    { "buffer": 0, "byteOffset": 144, "byteLength": 432, "target": 34962 }
+  ],
+  "cameras": [
+    {
+      "name": "persp_camera",
+      "perspective": {
+        "aspectRatio": 1.7777777910232544,
+        "yfov": 0.23466096069815817,
+        "zfar": 1000000.0,
+        "znear": 1.0
+      },
+      "type": "perspective"
+    },
+    {
+      "name": "orth_camera",
+      "orthographic": {
+        "xmag": 5.0,
+        "ymag": 2.8125,
+        "zfar": 1000000.0,
+        "znear": 1.0
+      },
+      "type": "orthographic"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "mesh_0",
+      "primitives": [{ "attributes": { "POSITION": 1 }, "indices": 0 }]
+    }
+  ],
+  "nodes": [
+    { "name": "box_camera", "children": [1] },
+    { "name": "mesh_0", "mesh": 0 },
+    { "name": "cameras", "children": [3, 4] },
+    {
+      "name": "persp_camera",
+      "camera": 0,
+      "matrix": [
+        0.8910065241883679, 0.0, 0.45399049973954675, 0.0, 0.11750138762820568,
+        0.9659258262890683, -0.23060945777054942, 0.0, -0.43852114858830876,
+        0.25881904510252074, 0.8606462131056, 0.0, -6.0, 3.3, 11.5, 1.0
+      ]
+    },
+    {
+      "name": "orth_camera",
+      "camera": 1,
+      "matrix": [
+        1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+        10.0, 1.0
+      ]
+    }
+  ],
+  "scenes": [{ "nodes": [0, 2] }]
+}

@@ -1,0 +1,82 @@
+#usda 1.0
+(
+    defaultPrim = "box_camera"
+    endTimeCode = 1
+    framesPerSecond = 24
+    metersPerUnit = 1
+    startTimeCode = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "box_camera" (
+    kind = "component"
+)
+{
+    matrix4d xformOp:transform:xform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform:xform"]
+
+    def Mesh "mesh_0"
+    {
+        float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 4, 5, 7, 6, 6, 7, 2, 3, 5, 4, 1, 0, 5, 0, 2, 7, 1, 4, 6, 3]
+        uniform token orientation = "leftHanded"
+        point3f[] points = [(0.5, -0.5, 0.5), (-0.5, -0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, 0.5, 0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (-0.5, 0.5, -0.5), (0.5, 0.5, -0.5)] (
+            interpolation = "vertex"
+        )
+        uniform token subdivisionScheme = "none"
+    }
+}
+
+def Xform "cameras"
+{
+    def Camera "persp_camera" (
+        prepend apiSchemas = ["HoudiniCameraPlateAPI", "HoudiniViewportGuideAPI"]
+    )
+    {
+        float2 clippingRange = (1, 1000000)
+        float exposure = 0
+        float focalLength = 0.5
+        float focusDistance = 5
+        float fStop = 0
+        float horizontalAperture = 0.20955
+        float horizontalApertureOffset = 0
+        asset houdini:backgroundimage = @@
+        asset houdini:foregroundimage = @@
+        float houdini:guidescale = 1
+        bool houdini:inviewermenu = 1
+        token projection = "perspective"
+        double shutter:close = 0.25
+        double shutter:open = -0.25
+        float verticalAperture = 0.11787187
+        float verticalApertureOffset = 0
+        matrix4d xformOp:transform = ( (0.8910065241883679, 0, 0.45399049973954675, 0), (0.11750138762820568, 0.9659258262890683, -0.23060945777054942, 0), (-0.43852114858830876, 0.25881904510252074, 0.8606462131056, 0), (-6, 3.3, 11.5, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+    }
+
+    def Camera "orth_camera" (
+        prepend apiSchemas = ["HoudiniCameraPlateAPI", "HoudiniViewportGuideAPI"]
+    )
+    {
+        float2 clippingRange = (1, 1000000)
+        float exposure = 0
+        float focalLength = 0.5
+        float focusDistance = 5
+        float fStop = 0
+        float horizontalAperture = 50
+        float horizontalApertureOffset = 0
+        asset houdini:backgroundimage = @@
+        asset houdini:foregroundimage = @@
+        float houdini:guidescale = 1
+        bool houdini:inviewermenu = 1
+        token projection = "orthographic"
+        double shutter:close = 0.25
+        double shutter:open = -0.25
+        float verticalAperture = 28.125
+        float verticalApertureOffset = 0
+        matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 10, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+    }
+}
+

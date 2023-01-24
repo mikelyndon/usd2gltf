@@ -1,0 +1,122 @@
+#usda 1.0
+(
+    defaultPrim = "box_lights"
+    endTimeCode = 1
+    framesPerSecond = 24
+    metersPerUnit = 1
+    startTimeCode = 1
+    timeCodesPerSecond = 24
+    upAxis = "Y"
+)
+
+def Xform "box_lights" (
+    kind = "component"
+)
+{
+    matrix4d xformOp:transform:xform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform:xform"]
+
+    def Mesh "mesh_0"
+    {
+        float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [0, 1, 3, 2, 4, 5, 7, 6, 6, 7, 2, 3, 5, 4, 1, 0, 5, 0, 2, 7, 1, 4, 6, 3]
+        uniform token orientation = "leftHanded"
+        point3f[] points = [(0.5, -0.5, 0.5), (-0.5, -0.5, 0.5), (0.5, 0.5, 0.5), (-0.5, 0.5, 0.5), (-0.5, -0.5, -0.5), (0.5, -0.5, -0.5), (-0.5, 0.5, -0.5), (0.5, 0.5, -0.5)] (
+            interpolation = "vertex"
+        )
+        uniform token subdivisionScheme = "none"
+    }
+}
+
+def Xform "lights"
+{
+    def SphereLight "pointlight1" (
+        prepend apiSchemas = ["HoudiniViewportGuideAPI"]
+    )
+    {
+        float houdini:guidescale = 1
+        bool houdini:inviewermenu = 1
+        color3f inputs:color = (1, 1, 1)
+        float inputs:diffuse = 1
+        bool inputs:enableColorTemperature = 0
+        float inputs:exposure = 0
+        float inputs:intensity = 1
+        bool inputs:normalize = 0
+        float inputs:specular = 1
+        rel light:filters = None
+        bool treatAsPoint = 1
+        matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (2, 2, 2, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+    }
+
+    def DistantLight "distantlight1" (
+        prepend apiSchemas = ["HoudiniViewportGuideAPI"]
+    )
+    {
+        float houdini:guidescale = 1
+        bool houdini:inviewermenu = 1
+        float inputs:angle = 0.53
+        color3f inputs:color = (1, 1, 1)
+        float inputs:diffuse = 1
+        bool inputs:enableColorTemperature = 0
+        float inputs:exposure = 0
+        float inputs:intensity = 1
+        bool inputs:normalize = 1
+        float inputs:specular = 1
+        rel light:filters = None
+        matrix4d xformOp:transform = ( (-1, 0, -0, 0), (-0, 0.3420201433256688, 0.9396926207859083, 0), (-0, 0.9396926207859083, -0.3420201433256688, 0), (-0, 0, -0, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+    }
+
+    def DiskLight "spotlight1" (
+        prepend apiSchemas = ["ShapingAPI", "HoudiniViewportGuideAPI"]
+    )
+    {
+        custom float barndoorbottom = 0
+        custom float barndoorbottomedge = 0
+        custom float barndoorleft = 0
+        custom float barndoorleftedge = 0
+        custom float barndoorright = 0
+        custom float barndoorrightedge = 0
+        custom float barndoortop = 0
+        custom float barndoortopedge = 0
+        bool houdini:inviewermenu = 1
+        color3f inputs:color = (1, 1, 1)
+        float inputs:diffuse = 1
+        bool inputs:enableColorTemperature = 0
+        float inputs:exposure = 0
+        float inputs:intensity = 1
+        bool inputs:normalize = 0
+        float inputs:radius = 0.5
+        float inputs:shaping:cone:angle = 90
+        float inputs:shaping:cone:softness = 0
+        float inputs:specular = 1
+        rel light:filters = None
+        matrix4d xformOp:transform = ( (0.7071067811865478, 0, 0.7071067811865472, 0), (0.27628863057543757, 0.9205048534524404, -0.2762886305754378, 0), (-0.6508952239913495, 0.39073112848927377, 0.65089522399135, 0), (-2, 1, 2, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+    }
+
+    def DomeLight "domelight1" (
+        prepend apiSchemas = ["HoudiniViewportGuideAPI"]
+    )
+    {
+        custom rel filters = None
+        float houdini:guidescale = 1
+        bool houdini:inviewermenu = 0
+        color3f inputs:color = (1, 1, 1)
+        float inputs:diffuse = 1
+        bool inputs:enableColorTemperature = 0
+        float inputs:exposure = 0
+        float inputs:intensity = 1
+        bool inputs:normalize = 0
+        float inputs:specular = 1
+        asset inputs:texture:file = @@
+        token inputs:texture:format = "automatic"
+        rel light:filters = None
+        rel portals = None
+        matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform"]
+    }
+}
+

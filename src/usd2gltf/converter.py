@@ -1,4 +1,4 @@
-from pxr import Usd, UsdGeom, UsdShade
+from pxr import Usd, UsdGeom, UsdShade, UsdLux
 import zipfile
 import tempfile
 import os
@@ -6,7 +6,7 @@ from gltflib import GLTF, GLTFModel, Asset, Buffer, FileResource, Scene
 import logging
 from usd2gltf import common
 from pathlib import Path
-from usd2gltf.converters import usd_mesh, usd_xform, usd_material
+from usd2gltf.converters import usd_mesh, usd_xform, usd_material, usd_camera, usd_lux
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -85,7 +85,6 @@ class Converter:
         self.is_glb = True
         self.dirname = ""
         self.basename_without_ext = ""
-
 
         self.resources = []
 
@@ -173,7 +172,9 @@ class Converter:
             if self.convert_materials:
                 # Handle materials
                 if prim.IsA(UsdShade.Material):
-                    material_id, gltfMaterial = usd_material.convert(self, UsdShade.Material(prim))
+                    material_id, gltfMaterial = usd_material.convert(
+                        self, UsdShade.Material(prim)
+                    )
 
                     self.materialMap[ppath] = material_id
 
@@ -198,6 +199,10 @@ class Converter:
 
                 is_visible = parent_vis
 
+                if prim.IsA(UsdLux.DomeLight) and is_visible:
+                    logger.warning("Dome lights are not supported. {} will not be exported.".format(ppath))
+                    continue
+
                 # Handle transforms
                 if prim.IsA(UsdGeom.Xformable) and is_visible:
                     node_id, gltfNode = usd_xform.convert(self, UsdGeom.Xformable(prim))
@@ -205,6 +210,31 @@ class Converter:
 
                     self.heirachyMap[ppath] = node_id
                     self.nodeMap[ppath] = gltfNode
+
+                # Handle lights
+                _lightBase = None
+                try:
+                    _lightBase = UsdLux.BoundableLightBase
+                except Exception:
+                    _lightBase = UsdLux.Light
+
+                if _lightBase:
+                    if prim.IsA(_lightBase) or prim.IsA(UsdLux.DistantLight) and is_visible:
+                        gltfLight = usd_lux.convert(self, _lightBase(prim))
+
+                        light_id = len(self.lights)
+                        self.lights.append(gltfLight)
+                        gltfNode.extensions = {}
+                        gltfNode.extensions["KHR_lights_punctual"] = {"light": light_id}
+
+                # Handle cameras
+                if prim.IsA(UsdGeom.Camera) and is_visible:
+                    camera_id, gltfCamera = usd_camera.convert(
+                        self, UsdGeom.Camera(prim)
+                    )
+
+                    gltfNode.camera = camera_id
+                    self.cameras.append(gltfCamera)
 
                 # Handle meshes
                 if prim.IsA(UsdGeom.Mesh):
@@ -254,6 +284,17 @@ class Converter:
 
         if len(self.materials) > 0:
             self.gltfDoc.materials = self.materials
+
+        if len(self.cameras) > 0:
+            self.gltfDoc.cameras = self.cameras
+
+        if len(self.lights) > 0:
+            if self.gltfDoc.extensions is None:
+                self.gltfDoc.extensions = {}
+            self.gltfDoc.extensions['KHR_lights_punctual'] = {
+                'lights': self.lights
+            }
+            self.add_extension('KHR_lights_punctual')
 
         if len(self.samplers) > 0:
             self.gltfDoc.samplers = self.samplers

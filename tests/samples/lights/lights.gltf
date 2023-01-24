@@ -1,0 +1,95 @@
+{
+  "extensions": {
+    "KHR_lights_punctual": {
+      "lights": [
+        {
+          "type": "point",
+          "intensity": 1.0,
+          "color": [1.0, 1.0, 1.0],
+          "name": "pointlight1_light",
+          "extras": {}
+        },
+        {
+          "type": "directional",
+          "intensity": 1.0,
+          "color": [1.0, 1.0, 1.0],
+          "name": "distantlight1_light",
+          "extras": {}
+        },
+        {
+          "type": "spot",
+          "spot": {
+            "outerConeAngle": 1.5707963267948966,
+            "innerConeAngle": 1.5707953267948966
+          },
+          "intensity": 1.0,
+          "color": [1.0, 1.0, 1.0],
+          "name": "spotlight1_light",
+          "extras": {}
+        }
+      ]
+    }
+  },
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 36,
+      "type": "SCALAR",
+      "max": [35],
+      "min": [0]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 36,
+      "type": "VEC3",
+      "max": [0.5, 0.5, 0.5],
+      "min": [-0.5, -0.5, -0.5]
+    }
+  ],
+  "asset": { "version": "2.0" },
+  "buffers": [{ "uri": "lights_geometry.bin", "byteLength": 576 }],
+  "bufferViews": [
+    { "buffer": 0, "byteOffset": 0, "byteLength": 144, "target": 34963 },
+    { "buffer": 0, "byteOffset": 144, "byteLength": 432, "target": 34962 }
+  ],
+  "meshes": [
+    {
+      "name": "mesh_0",
+      "primitives": [{ "attributes": { "POSITION": 1 }, "indices": 0 }]
+    }
+  ],
+  "nodes": [
+    { "name": "box_lights", "children": [1] },
+    { "name": "mesh_0", "mesh": 0 },
+    { "name": "lights", "children": [3, 4, 5] },
+    {
+      "extensions": { "KHR_lights_punctual": { "light": 0 } },
+      "name": "pointlight1",
+      "matrix": [
+        1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 2.0,
+        2.0, 1.0
+      ]
+    },
+    {
+      "extensions": { "KHR_lights_punctual": { "light": 1 } },
+      "name": "distantlight1",
+      "matrix": [
+        -1.0, 0.0, 0.0, 0.0, -0.0, 0.3420201433256688, 0.9396926207859083, 0.0,
+        -0.0, 0.9396926207859083, -0.3420201433256688, 0.0, -0.0, 0.0, 0.0, 1.0
+      ]
+    },
+    {
+      "extensions": { "KHR_lights_punctual": { "light": 2 } },
+      "name": "spotlight1",
+      "matrix": [
+        0.7071067811865478, 0.0, 0.7071067811865472, 0.0, 0.27628863057543757,
+        0.9205048534524404, -0.2762886305754378, 0.0, -0.6508952239913495,
+        0.39073112848927377, 0.65089522399135, 0.0, -2.0, 1.0, 2.0, 1.0
+      ]
+    }
+  ],
+  "scenes": [{ "nodes": [0, 2] }],
+  "extensionsUsed": ["KHR_lights_punctual"]
+}

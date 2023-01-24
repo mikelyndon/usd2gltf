@@ -79,5 +79,23 @@
     "outputs": {
       "gltf": "box_material.gltf"
     }
+  },
+  {
+    "name": "camera",
+    "inputs": {
+      "usda": "camera.usda"
+    },
+    "outputs": {
+      "gltf": "camera.gltf"
+    }
+  },
+  {
+    "name": "lights",
+    "inputs": {
+      "usda": "lights.usda"
+    },
+    "outputs": {
+      "gltf": "lights.gltf"
+    }
   }
 ]

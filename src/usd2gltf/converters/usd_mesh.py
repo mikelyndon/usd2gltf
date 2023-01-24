@@ -831,7 +831,6 @@ def convert(converter, usd_mesh):
         # Skip this while figuring out the points and indices basics.
         for sub in subsets:
             # if s < len(subsets):
-            print("sub: {}".format(sub))
             try:
                 # sub = subsets[s]
                 mat_api = UsdShade.MaterialBindingAPI(sub)
