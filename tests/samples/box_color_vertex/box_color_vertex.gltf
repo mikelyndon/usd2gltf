@@ -13,35 +13,35 @@
       "componentType": 5126,
       "count": 36,
       "type": "VEC3",
-      "max": [0.5, 0.5, 0.5],
-      "min": [-0.5, -0.5, -0.5]
+      "max": [0.4999999701976776, 0.5, 0.4999999701976776],
+      "min": [-0.4999999701976776, -0.5, -0.4999999701976776]
     },
     {
       "bufferView": 2,
       "componentType": 5126,
       "count": 36,
-      "type": "VEC2",
-      "max": [0.9979166984558105, 1.0],
-      "min": [0.0, 0.33509111404418945]
+      "type": "VEC3",
+      "max": [0.959619402885437, 0.824999988079071, 0.959619402885437],
+      "min": [0.040380626916885376, 0.17500001192092896, 0.040380626916885376]
     }
   ],
   "asset": { "version": "2.0" },
-  "buffers": [{ "uri": "box_uv_geometry.bin", "byteLength": 864 }],
+  "buffers": [{ "uri": "box_color_vertex_geometry.bin", "byteLength": 1008 }],
   "bufferViews": [
     { "buffer": 0, "byteOffset": 0, "byteLength": 144, "target": 34963 },
     { "buffer": 0, "byteOffset": 144, "byteLength": 432, "target": 34962 },
-    { "buffer": 0, "byteOffset": 576, "byteLength": 288, "target": 34962 }
+    { "buffer": 0, "byteOffset": 576, "byteLength": 432, "target": 34962 }
   ],
   "meshes": [
     {
       "name": "mesh_0",
       "primitives": [
-        { "attributes": { "POSITION": 1, "TEXCOORD_0": 2 }, "indices": 0 }
+        { "attributes": { "POSITION": 1, "COLOR_0": 2 }, "indices": 0 }
       ]
     }
   ],
   "nodes": [
-    { "name": "box_uv", "children": [1] },
+    { "name": "box_color_vertex", "children": [1] },
     { "name": "mesh_0", "mesh": 0 }
   ],
   "scenes": [{ "nodes": [0] }]

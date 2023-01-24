@@ -1,4 +1,3 @@
-from re import A
 from pxr import Usd, UsdGeom, UsdShade, Sdf
 import numpy as np
 
@@ -431,8 +430,8 @@ def convert(converter, usd_mesh):
             if normal_attr.HasValue():
 
                 rawNormals = common._GetStaticValue(normal_attr)
-                logger.debug("normals faces: {}".format(faces))
-                logger.debug("normals array: {}".format(rawNormals))
+                # logger.debug("normals faces: {}".format(faces))
+                # logger.debug("normals array: {}".format(rawNormals))
                 normals = []
                 if usd_mesh.GetNormalsInterpolation() == "faceVarying":
                     n = _get_triangulated_attribute(
@@ -442,6 +441,7 @@ def convert(converter, usd_mesh):
                 elif usd_mesh.GetNormalsInterpolation() == "vertex":
                     normals = [rawNormals[int(x)] for x in sub_index_array]
                 normals = np.array(normals, "float32")
+                # logger.debug("Converted Normals: {}".format(normals))
                 normals = normals.reshape(-1, normals.shape[-1])
                 _process_mesh_attribute(
                     converter,
@@ -584,8 +584,8 @@ def convert(converter, usd_mesh):
                     if stCoords.IsDefined():
                         rawUVS = common._GetStaticValue(stCoords)
 
-                        logger.debug("uv faces: {}".format(faces))
-                        logger.debug("uv array: {}".format(rawUVS))
+                        # logger.debug("uv faces: {}".format(faces))
+                        # logger.debug("uv array: {}".format(rawUVS))
                         start_byte_len = len(converter.maindata_bytearray)
                         uvs = []
                         if "faceVarying" in stCoords.GetInterpolation():
@@ -755,6 +755,47 @@ def convert(converter, usd_mesh):
                         # else:
                         #     primitives[sub_idx].attributes.TEXCOORD_1 = uvs_accessor_id
 
+        # Colors
+        if converter.convert_colors:
+            if len(colors) > 0:
+
+                colors_accessor_id = -1
+
+                # GLTF only supports one color attribute, use first found (Usually displayColor)
+                displayColor = colors[0]
+
+                color_name = displayColor.GetName().split(":")[1]
+
+                color_idx = 0
+
+                if displayColor.IsDefined() and displayColor.HasAuthoredValue():
+                    rawColors = common._GetStaticValue(displayColor)
+                    # logger.debug("Raw Colors: {}".format(rawColors))
+                    convertedColors = []
+
+                    start_byte_len = len(converter.maindata_bytearray)
+
+                    logger.debug("   - color: {0} : {1}".format(color_name, color_idx))
+
+                    if "faceVarying" in displayColor.GetInterpolation():
+                        cd = _get_triangulated_attribute(
+                            faces, rawColors, is_index=True, isLeftHanded=isLeftHanded
+                        )
+                        convertedColors = [cd[int(x)] for x in sub_tri_indices]
+                    elif "vertex" in displayColor.GetInterpolation():
+                        convertedColors = [rawColors[int(x)] for x in sub_index_array]
+                    convertedColors = np.array(convertedColors, "float32")
+                    convertedColors = convertedColors.reshape(-1, convertedColors.shape[-1])
+                    # logger.debug("Converted Colors: {}".format(convertedColors))
+                    _process_mesh_attribute(
+                        converter,
+                        convertedColors,
+                        min=convertedColors.min(axis=0).tolist(),
+                        max=convertedColors.max(axis=0).tolist(),
+                    )
+                    primitives[sub_idx].attributes.COLOR_0 = (
+                        len(converter.gltfDoc.accessors) - 1
+                    )
         # Material Binding
         # Done before primvars for texcoord lookup
 
@@ -788,33 +829,36 @@ def convert(converter, usd_mesh):
 
         # Set material for subset
         # Skip this while figuring out the points and indices basics.
-        if False:
-            for s in range(num_subsets):
-                if s < len(subsets):
-                    sub = subsets[s]
-                    mat_api = UsdShade.MaterialBindingAPI(sub)
-                    mat_path = mat_api.ComputeBoundMaterial()[0].GetPath()
+        for sub in subsets:
+            # if s < len(subsets):
+            print("sub: {}".format(sub))
+            try:
+                # sub = subsets[s]
+                mat_api = UsdShade.MaterialBindingAPI(sub)
+                mat_path = mat_api.ComputeBoundMaterial()[0].GetPath()
 
-                    if mat_path in converter.materialMap:
-                        subset_mat_id = converter.materialMap[mat_path]
+                if mat_path in converter.materialMap:
+                    subset_mat_id = converter.materialMap[mat_path]
 
-                        # Handle double sidedness
-                        # Vochsel Note: USD handles this per mesh, GLTF per material
-                        # This will break if multiple meshes set sideness with same material
-                        # We could check for an attribute on the material, but I feel less happy about
-                        # this solution.
-                        should_set = (
-                            not mat_api.ComputeBoundMaterial()[0]
-                            .GetPrim()
-                            .HasAttribute("doubleSided")
-                        )
-                        if should_set:
-                            if subset_mat_id >= 0:
-                                converter.materials[
-                                    subset_mat_id
-                                ].doubleSided = isDoubleSided
+                    # Handle double sidedness
+                    # Vochsel Note: USD handles this per mesh, GLTF per material
+                    # This will break if multiple meshes set sideness with same material
+                    # We could check for an attribute on the material, but I feel less happy about
+                    # this solution.
+                    should_set = (
+                        not mat_api.ComputeBoundMaterial()[0]
+                        .GetPrim()
+                        .HasAttribute("doubleSided")
+                    )
+                    if should_set:
+                        if subset_mat_id >= 0:
+                            converter.materials[
+                                subset_mat_id
+                            ].doubleSided = isDoubleSided
 
-                        primitives[s].material = subset_mat_id
+                    primitives[s].material = subset_mat_id
+            except Exception:
+                pass
 
         # TODO: (bjs: 3/May/22) Unsure why this was added, but it breaks subsets... Removed for now
         # print( "num_subsets = {}".format(num_subsets) )

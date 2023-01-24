@@ -1,4 +1,4 @@
-from pxr import Usd, UsdGeom
+from pxr import Usd, UsdGeom, UsdShade
 import zipfile
 import tempfile
 import os
@@ -6,7 +6,7 @@ from gltflib import GLTF, GLTFModel, Asset, Buffer, FileResource, Scene
 import logging
 from usd2gltf import common
 from pathlib import Path
-from usd2gltf.converters import usd_mesh, usd_xform
+from usd2gltf.converters import usd_mesh, usd_xform, usd_material
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -83,6 +83,9 @@ class Converter:
         self.material_uv_indices = {}  # Primpath -> uv_name -> uv_index
 
         self.is_glb = True
+        self.dirname = ""
+        self.basename_without_ext = ""
+
 
         self.resources = []
 
@@ -158,7 +161,28 @@ class Converter:
             # extensions={},
         )
 
-        basename_without_ext = os.path.splitext(os.path.basename(outputGLTF))[0]
+        self.dirname = os.path.dirname(outputGLTF)
+        self.basename_without_ext = os.path.splitext(os.path.basename(outputGLTF))[0]
+
+        # Material Ingestion
+        logger.debug("Materials: ")
+        # Must be done first to populate materialMap for mesh assignment
+        for prim in self.stage.Traverse():
+            ppath = prim.GetPrimPath()
+
+            if self.convert_materials:
+                # Handle materials
+                if prim.IsA(UsdShade.Material):
+                    material_id, gltfMaterial = usd_material.convert(self, UsdShade.Material(prim))
+
+                    self.materialMap[ppath] = material_id
+
+            # Gather for later
+            if prim.IsA(UsdGeom.PointInstancer):
+                pi = UsdGeom.PointInstancer(prim)
+                point_instancers.append(pi)
+
+                point_instancer_prototypes += pi.GetPrototypesRel().GetTargets()
 
         # Primitive Ingestion
         logger.debug("Primitives: ")
@@ -222,6 +246,15 @@ class Converter:
 
         # Add necessary Components
 
+        if len(self.images) > 0:
+            self.gltfDoc.images = self.images
+
+        if len(self.textures) > 0:
+            self.gltfDoc.textures = self.textures
+
+        if len(self.materials) > 0:
+            self.gltfDoc.materials = self.materials
+
         if len(self.samplers) > 0:
             self.gltfDoc.samplers = self.samplers
 
@@ -229,12 +262,12 @@ class Converter:
         self.gltfDoc.buffers.append(
             Buffer(
                 byteLength=len(self.maindata_bytearray),
-                uri="{}_geometry.bin".format(basename_without_ext),
+                uri="{}_geometry.bin".format(self.basename_without_ext),
             )
         )
         self.resources.append(
             FileResource(
-                "{}_geometry.bin".format(basename_without_ext),
+                "{}_geometry.bin".format(self.basename_without_ext),
                 data=self.maindata_bytearray,
             )
         )
@@ -243,12 +276,12 @@ class Converter:
             self.gltfDoc.buffers.append(
                 Buffer(
                     byteLength=len(self.animated_xforms_bytearray),
-                    uri="{}_animation.bin".format(basename_without_ext),
+                    uri="{}_animation.bin".format(self.basename_without_ext),
                 )
             )
             self.resources.append(
                 FileResource(
-                    "{}_animation.bin".format(basename_without_ext),
+                    "{}_animation.bin".format(self.basename_without_ext),
                     data=self.animated_xforms_bytearray,
                 )
             )

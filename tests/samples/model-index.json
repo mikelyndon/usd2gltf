@@ -9,21 +9,21 @@
     }
   },
   {
-    "name": "box_vertex_normals",
+    "name": "box_normals_facevarying",
     "inputs": {
-      "usda": "box_vertex_normals.usda"
+      "usda": "box_normals_facevarying.usda"
     },
     "outputs": {
-      "gltf": "box_vertex_normals.gltf"
+      "gltf": "box_normals_facevarying.gltf"
     }
   },
   {
-    "name": "box_point_normals",
+    "name": "box_normals_vertex",
     "inputs": {
-      "usda": "box_point_normals.usda"
+      "usda": "box_normals_vertex.usda"
     },
     "outputs": {
-      "gltf": "box_point_normals.gltf"
+      "gltf": "box_normals_vertex.gltf"
     }
   },
   {
@@ -45,21 +45,39 @@
     }
   },
   {
-    "name": "box_vertex_color",
+    "name": "box_color_facevarying",
     "inputs": {
-      "usda": "box_vertex_color.usda"
+      "usda": "box_color_facevarying.usda"
     },
     "outputs": {
-      "gltf": "box_vertex_color.gltf"
+      "gltf": "box_color_facevarying.gltf"
     }
   },
   {
-    "name": "box_point_color",
+    "name": "box_color_vertex",
     "inputs": {
-      "usda": "box_point_color.usda"
+      "usda": "box_color_vertex.usda"
     },
     "outputs": {
-      "gltf": "box_point_color.gltf"
+      "gltf": "box_color_vertex.gltf"
+    }
+  },
+  {
+    "name": "box_uv",
+    "inputs": {
+      "usda": "box_uv.usda"
+    },
+    "outputs": {
+      "gltf": "box_uv.gltf"
+    }
+  },
+  {
+    "name": "box_material",
+    "inputs": {
+      "usda": "box_material.usda"
+    },
+    "outputs": {
+      "gltf": "box_material.gltf"
     }
   }
 ]

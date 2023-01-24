@@ -1,6 +1,6 @@
 #usda 1.0
 (
-    defaultPrim = "box_point_normals"
+    defaultPrim = "box_normals_vertex"
     endTimeCode = 1
     framesPerSecond = 24
     metersPerUnit = 1
@@ -9,7 +9,7 @@
     upAxis = "Y"
 )
 
-def Xform "box_point_normals" (
+def Xform "box_normals_vertex" (
     kind = "component"
 )
 {
