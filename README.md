@@ -1,7 +1,7 @@
 # usd2gltf
 USD to GLTF/GLB converter
 
-Current version `0.0.1`
+Current version `0.1.0`
 
 ## Requirements
 

@@ -8,7 +8,7 @@ from usd2gltf import common
 from pathlib import Path
 from usd2gltf.converters import usd_mesh, usd_xform, usd_material, usd_camera, usd_lux
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -200,7 +200,11 @@ class Converter:
                 is_visible = parent_vis
 
                 if prim.IsA(UsdLux.DomeLight) and is_visible:
-                    logger.warning("Dome lights are not supported. {} will not be exported.".format(ppath))
+                    logger.warning(
+                        "Dome lights are not supported. {} will not be exported.".format(
+                            ppath
+                        )
+                    )
                     continue
 
                 # Handle transforms
@@ -219,7 +223,11 @@ class Converter:
                     _lightBase = UsdLux.Light
 
                 if _lightBase:
-                    if prim.IsA(_lightBase) or prim.IsA(UsdLux.DistantLight) and is_visible:
+                    if (
+                        prim.IsA(_lightBase)
+                        or prim.IsA(UsdLux.DistantLight)
+                        and is_visible
+                    ):
                         gltfLight = usd_lux.convert(self, _lightBase(prim))
 
                         light_id = len(self.lights)
@@ -291,10 +299,8 @@ class Converter:
         if len(self.lights) > 0:
             if self.gltfDoc.extensions is None:
                 self.gltfDoc.extensions = {}
-            self.gltfDoc.extensions['KHR_lights_punctual'] = {
-                'lights': self.lights
-            }
-            self.add_extension('KHR_lights_punctual')
+            self.gltfDoc.extensions["KHR_lights_punctual"] = {"lights": self.lights}
+            self.add_extension("KHR_lights_punctual")
 
         if len(self.samplers) > 0:
             self.gltfDoc.samplers = self.samplers

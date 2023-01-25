@@ -777,15 +777,21 @@ def convert(converter, usd_mesh):
 
                     logger.debug("   - color: {0} : {1}".format(color_name, color_idx))
 
-                    if "faceVarying" in displayColor.GetInterpolation():
+                    if "constant" in displayColor.GetInterpolation():
+                        convertedColors = [rawColors[0]] * len(sub_index_array)
+
+                    elif "faceVarying" in displayColor.GetInterpolation():
                         cd = _get_triangulated_attribute(
                             faces, rawColors, is_index=True, isLeftHanded=isLeftHanded
                         )
                         convertedColors = [cd[int(x)] for x in sub_tri_indices]
+
                     elif "vertex" in displayColor.GetInterpolation():
                         convertedColors = [rawColors[int(x)] for x in sub_index_array]
                     convertedColors = np.array(convertedColors, "float32")
-                    convertedColors = convertedColors.reshape(-1, convertedColors.shape[-1])
+                    convertedColors = convertedColors.reshape(
+                        -1, convertedColors.shape[-1]
+                    )
                     # logger.debug("Converted Colors: {}".format(convertedColors))
                     _process_mesh_attribute(
                         converter,

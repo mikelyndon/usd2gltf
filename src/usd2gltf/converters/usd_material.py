@@ -52,6 +52,7 @@ def add_texture(converter, filepath, sampler=None):
     basepath = os.path.dirname(filepath)
 
     if not converter.is_glb:
+        os.makedirs(converter.dirname, exist_ok=True)
         shutil.copy(filepath, converter.dirname)
         filepath = os.path.join(converter.dirname, filename)
         basepath = converter.dirname

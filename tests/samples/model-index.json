@@ -45,6 +45,15 @@
     }
   },
   {
+    "name": "box_color_constant",
+    "inputs": {
+      "usda": "box_color_constant.usda"
+    },
+    "outputs": {
+      "gltf": "box_color_constant.gltf"
+    }
+  },
+  {
     "name": "box_color_facevarying",
     "inputs": {
       "usda": "box_color_facevarying.usda"
