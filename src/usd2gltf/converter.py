@@ -2,13 +2,26 @@ from pxr import Usd, UsdGeom, UsdShade, UsdLux
 import zipfile
 import tempfile
 import os
-from gltflib import GLTF, GLTFModel, Asset, Buffer, FileResource, Scene
+from gltflib import (
+    GLTF,
+    GLTFModel,
+    Asset,
+    Buffer,
+    FileResource,
+    Scene,
+    BufferView,
+    Animation,
+)
 import logging
-from usd2gltf import common
 from pathlib import Path
-from usd2gltf.converters import usd_mesh, usd_xform, usd_material, usd_camera, usd_lux
+from usd2gltf.converters import (
+        usd_mesh,
+        usd_xform,
+        usd_material,
+        usd_camera,
+        usd_lux
+        )
 
-# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -105,7 +118,6 @@ class Converter:
     def _gatherChildren(self, prim):
         children_array = []
         for c in prim.GetChildren():
-            # if c.IsA(UsdGeom.Xformable) or c.GetTypeName() == "Preliminary_Text":
             if c.IsA(UsdGeom.Xformable):
                 if c.GetPrimPath() in self.heirachyMap:
                     child_idx = self.heirachyMap[c.GetPrimPath()]
@@ -126,9 +138,64 @@ class Converter:
 
         return None
 
+    def localize_zip(self, input_path):
+        # Unzip USDZ
+        if ".usdz" in input_path:
+            with zipfile.ZipFile(input_path, "r") as zip_ref:
+                zip_name = os.path.basename(input_path)
+                zip_ext = os.path.splitext(zip_name)[0]
+
+                temp_name = os.path.join(self.temp_dir.name, zip_ext)
+
+                os.mkdir(temp_name)
+
+                zip_ref.extractall(temp_name)
+
+                for path in Path(temp_name).rglob("*.usd*"):
+                    path = str(path)
+                    logger.debug("Unzipped source file: " + path)
+                    return path
+        else:
+            return input_path
+
     def load_usd(self, inputUSD):
-        # l = self.localize_zip(inputUSD)
-        return Usd.Stage.Open(inputUSD)
+        path = self.localize_zip(inputUSD)
+        return Usd.Stage.Open(path)
+
+    def animated_buffer_view(self):
+        if (
+            self.animated_xforms_bufferview_id == -1
+            and self.animated_xforms_bufferview is None
+        ):
+            # Setup buffers
+            self.animated_xforms_bufferview_id = len(self.gltfDoc.bufferViews)
+
+            self.animated_xforms_bufferview = BufferView(
+                buffer=1, byteOffset=0, byteLength=0
+            )
+
+            # Always add, subsequent bufferViews need the proper id
+            # Remove later if empty
+            self.gltfDoc.bufferViews.append(self.animated_xforms_bufferview)
+
+        return (self.animated_xforms_bufferview_id, self.animated_xforms_bufferview)
+
+    def get_named_animation(self, animation_name):
+        if self.flatten_xform_animation:
+            animation_name = "main_animation"
+
+        # Create animation if doesnt exist
+        if animation_name not in self.animations:
+            _animation = Animation(
+                name=animation_name,
+                channels=[],
+                samplers=[],
+            )
+            self.animations[animation_name] = _animation
+            logger.debug("Created anim: " + animation_name)
+
+        # Return animation object
+        return self.animations[animation_name]
 
     def add_extension(self, extension):
         if not self.gltfDoc.extensionsUsed:
@@ -146,6 +213,12 @@ class Converter:
         self.is_glb = outputGLTF.endswith(".glb")
 
         self.stage = stage
+
+        # TODO: Is this being used?
+        # Unzip all sublayers
+        for i, l in enumerate(self.stage.GetRootLayer().subLayerPaths):
+            if 'usdz' in l:
+                new_path = self.localize_zip(str(l))
 
         self.FPS = self.stage.GetFramesPerSecond()
 
@@ -283,6 +356,9 @@ class Converter:
                         self.nodes += [self.heirachyMap[ppath]]
 
         # Add necessary Components
+
+        if len(self.animations) > 0:
+            self.gltfDoc.animations = list(self.animations.values())
 
         if len(self.images) > 0:
             self.gltfDoc.images = self.images
