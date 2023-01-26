@@ -7,7 +7,6 @@ import math
 import logging
 
 from gltflib import (
-    GLTF,
     Primitive,
     Mesh,
     Attributes,
@@ -330,7 +329,7 @@ def convert(converter, usd_mesh):
                         #     primitives[sub_idx].attributes.TEXCOORD_1 = uvs_accessor_id
 
         # Colors
-        
+
         if converter.convert_colors:
             if len(colors) > 0:
 
@@ -375,7 +374,7 @@ def convert(converter, usd_mesh):
                     primitives[sub_idx].attributes.COLOR_0 = (
                         len(converter.gltfDoc.accessors) - 1
                     )
-        
+
         # Material Binding
 
         mesh_material_id = -1
