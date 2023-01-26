@@ -1,15 +1,14 @@
 import json
-import tempfile
-import subprocess
 import logging
 from os import path
 from unittest import TestCase
-from pathlib import Path
 from ..util import setup_temp_dir, SAMPLES_DIR, TEMP_DIR
 from gltflib import GLTF
 import usd2gltf.converter as converter
 
 logger = logging.getLogger(__name__)
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class TestConverter(TestCase):

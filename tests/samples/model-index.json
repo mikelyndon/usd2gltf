@@ -106,5 +106,14 @@
     "outputs": {
       "gltf": "lights.gltf"
     }
+  },
+  {
+    "name": "box_animation",
+    "inputs": {
+      "usda": "box_animation.usda"
+    },
+    "outputs": {
+      "gltf": "box_animation.gltf"
+    }
   }
 ]
