@@ -56,7 +56,7 @@ def main():
         default=False,
         help="Run in debug mode",
     )
-    
+
     parser.add_argument(
         "-f",
         "--flatten",
