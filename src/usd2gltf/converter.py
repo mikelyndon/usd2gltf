@@ -1,4 +1,4 @@
-from pxr import Usd, UsdGeom, UsdShade, UsdLux
+from pxr import Usd, UsdGeom, UsdShade, UsdLux, UsdSkel
 import zipfile
 import tempfile
 import os
@@ -19,7 +19,8 @@ from usd2gltf.converters import (
         usd_xform,
         usd_material,
         usd_camera,
-        usd_lux
+        usd_lux,
+        usd_skel
         )
 
 logger = logging.getLogger(__name__)
@@ -217,7 +218,7 @@ class Converter:
         # TODO: Is this being used?
         # Unzip all sublayers
         for i, l in enumerate(self.stage.GetRootLayer().subLayerPaths):
-            if 'usdz' in l:
+            if "usdz" in l:
                 new_path = self.localize_zip(str(l))
 
         self.FPS = self.stage.GetFramesPerSecond()
@@ -335,8 +336,86 @@ class Converter:
 
         traversePrims(self.stage.GetPseudoRoot())
 
+        # Handle skinned animation
+        if self.convert_skinned_animation:
+            for prim in self.stage.TraverseAll():
+                ppath = prim.GetPrimPath()
+
+                if prim.IsA(UsdSkel.Root):
+                    skelApi = UsdSkel.BindingAPI(prim)
+                    if skelApi.GetSkeletonRel():
+                        targets = skelApi.GetSkeletonRel().GetTargets()
+                        if len(targets) > 0:
+                            skel_rel = skelApi.GetSkeletonRel().GetTargets()[0]
+                            # For some reason in Houdini the skel and animation rels are null
+
+                if prim.IsA(UsdSkel.Skeleton):
+                    skel_prim = UsdSkel.Skeleton(prim)
+                    skel_id, gltfSkelRoot, joint_node_ids = usd_skel.add_skeleton_rig(
+                        self, skel_prim
+                    )
+
+                    skin_id, gltfSkin = usd_skel.add_skin(
+                        self, skel_prim, skel_id, joint_node_ids
+                    )
+
+                    # TODO: Could be mapped better
+                    # Map the scene object ids to skeleton local index
+                    self.skeleton_map[ppath] = {}
+
+                    for i, j in enumerate(joint_node_ids):
+                        self.skeleton_map[ppath][j] = i
+
+                    self.skins.append(gltfSkin)
+                    self.skin_map[ppath] = (skin_id, gltfSkin)
+
+                    self.nodeMap[ppath] = gltfSkelRoot
+                    self.heirachyMap[ppath] = skel_id
+
+                    skelApi = UsdSkel.BindingAPI(prim)
+                    if skelApi.GetAnimationSourceRel():
+                        targets = skelApi.GetAnimationSourceRel().GetTargets()
+                        if len(targets) > 0:
+                            animation_rel = skelApi.GetAnimationSource()
+                            usd_skel._addSkeletonAnimation(
+                                self, skel_prim, UsdSkel.Animation(animation_rel)
+                            )
+
+            idx = 0
+            for prim in self.stage.TraverseAll():
+                ppath = prim.GetPrimPath()
+
+                if prim.IsA(UsdGeom.Mesh):
+                    mesh_id, gltfMesh = self.mesh_map[ppath]
+
+                    skelBinding = UsdSkel.BindingAPI(prim)
+
+                    # TODO: Make nicer
+                    if not skelBinding.GetJointWeightsAttr().IsValid():
+                        continue
+
+                    # Weights
+
+                    usd_skel.add_weights(self, gltfMesh, UsdGeom.Mesh(prim))
+
+                    skelApi = UsdSkel.BindingAPI(prim)
+                    if skelApi.GetSkeletonRel():
+                        targets = skelApi.GetSkeletonRel().GetTargets()
+                        if len(targets) > 0:
+                            skel_rel = skelApi.GetSkeletonRel().GetTargets()[0]
+
+                            if skel_rel not in self.skin_map:
+                                continue
+
+                            skin_id, gltfSkin = self.skin_map[skel_rel]
+
+                            mnode = self.nodeMap[ppath]
+                            mnode.skin = skin_id
+
+                idx += 1
+
         if self.convert_hierarchy:
-            # Assign heirachy
+            # Assign hierachy
 
             for prim in self.stage.Traverse():
                 ppath = prim.GetPrimPath()
@@ -368,6 +447,9 @@ class Converter:
 
         if len(self.materials) > 0:
             self.gltfDoc.materials = self.materials
+
+        if len(self.skins) > 0:
+            self.gltfDoc.skins = self.skins
 
         if len(self.cameras) > 0:
             self.gltfDoc.cameras = self.cameras
@@ -408,11 +490,19 @@ class Converter:
                     data=self.animated_xforms_bytearray,
                 )
             )
-
-        # self.gltfDoc.buffers.append(Buffer(byteLength=len(
-        #     self.ibt_bytearray), uri='bindTransforms.bin'))
-        # self.resources.append(FileResource(
-        # 'bindTransforms.bin', data=self.ibt_bytearray))
+        if len(self.skins) > 0:
+            self.gltfDoc.buffers.append(
+                Buffer(
+                    byteLength=len(self.ibt_bytearray),
+                    uri="{}_bindTransforms.bin".format(self.basename_without_ext),
+                )
+            )
+            self.resources.append(
+                FileResource(
+                    "{}_bindTransforms.bin".format(self.basename_without_ext),
+                    data=self.ibt_bytearray,
+                )
+            )
 
         # Add scene
 
