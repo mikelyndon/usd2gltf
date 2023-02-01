@@ -63,7 +63,7 @@ def _get_triangulated_attribute(
     return_array = []
     j = 0
     for count in count_array:
-        poly = index_array[j : j + count]
+        poly = index_array[j: j + count]
 
         for i in range(count - 2):  # This is a trick for triangulating ngons
             tmp = []

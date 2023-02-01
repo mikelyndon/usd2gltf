@@ -115,5 +115,23 @@
     "outputs": {
       "gltf": "box_animation.gltf"
     }
+  },
+  {
+    "name": "skeleton_animation",
+    "inputs": {
+      "usda": "skeleton_animation.usda"
+    },
+    "outputs": {
+      "gltf": "skeleton_animation.gltf"
+    }
+  },
+  {
+    "name": "skinned_tube",
+    "inputs": {
+      "usda": "skinned_tube.usda"
+    },
+    "outputs": {
+      "gltf": "skinned_tube.gltf"
+    }
   }
 ]

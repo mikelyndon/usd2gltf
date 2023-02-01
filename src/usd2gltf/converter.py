@@ -15,13 +15,13 @@ from gltflib import (
 import logging
 from pathlib import Path
 from usd2gltf.converters import (
-    usd_mesh,
-    usd_xform,
-    usd_material,
-    usd_camera,
-    usd_lux,
-    usd_skel,
-)
+        usd_mesh,
+        usd_xform,
+        usd_material,
+        usd_camera,
+        usd_lux,
+        usd_skel
+        )
 
 logger = logging.getLogger(__name__)
 
@@ -415,7 +415,7 @@ class Converter:
                 idx += 1
 
         if self.convert_hierarchy:
-            # Assign heirachy
+            # Assign hierachy
 
             for prim in self.stage.Traverse():
                 ppath = prim.GetPrimPath()
@@ -490,7 +490,7 @@ class Converter:
                     data=self.animated_xforms_bytearray,
                 )
             )
-
+        if len(self.skins) > 0:
             self.gltfDoc.buffers.append(
                 Buffer(
                     byteLength=len(self.ibt_bytearray),
