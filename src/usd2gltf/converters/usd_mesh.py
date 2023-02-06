@@ -161,9 +161,9 @@ def convert(converter, usd_mesh):
     subsets = UsdGeom.Subset.GetAllGeomSubsets(usd_mesh)
 
     logger.debug(" - mesh[{0}]: {1} : {2}".format(mesh_id, ppath, mesh_name))
-    if len(subsets) > 0:
-        for subset in subsets:
-            logger.debug("  - {}".format(subset))
+    # if len(subsets) > 0:
+    #     for subset in subsets:
+    #         logger.debug("  - {}".format(subset))
 
     remaining_idcs = UsdGeom.Subset.GetUnassignedIndices(subsets, len(faces))
 
