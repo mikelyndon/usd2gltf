@@ -198,7 +198,7 @@ def convert(converter, usd_mesh):
     # Loop through subsets
 
     for sub_idx, subset_indices in enumerate(subset_idcs):
-        logger.debug("  - subset[{}]".format(list(subset_indices)))
+        # logger.debug("  - subset[{}]".format(list(subset_indices)))
 
         # Indices
         if can_use_mesh_indices:
