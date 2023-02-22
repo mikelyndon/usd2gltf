@@ -93,6 +93,12 @@ def _GetStaticValue(attribute):
         return attribute.Get(ts[0])
     return attribute.Get(Usd.TimeCode.Default())
 
+def _GetFlattenedStaticValue(attribute):
+    ts = attribute.GetTimeSamples()
+    if len(ts) > 0:
+        return attribute.ComputeFlattened(ts[0])
+    return attribute.ComputeFlattened(Usd.TimeCode.Default())
+
 
 def _GetAnimationNameFromUSD(prim):
     try:
