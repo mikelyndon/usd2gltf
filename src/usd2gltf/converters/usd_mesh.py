@@ -58,7 +58,7 @@ def _process_mesh_attribute(
 
 
 def _get_triangulated_attribute(
-    count_array, index_array, is_index=False, isLeftHanded=True
+    count_array, index_array, is_index=False, isLeftHanded=True 
 ):
     return_array = []
     j = 0
@@ -153,7 +153,7 @@ def convert(converter, usd_mesh):
         index_map[i] = tmp
 
     triangulated_index = _get_triangulated_attribute(
-        faces, idcs, is_index=True, isLeftHanded=isLeftHanded
+        faces, idcs, is_index=True, isLeftHanded=isLeftHanded 
     )
 
     # Get subsets
@@ -256,7 +256,7 @@ def convert(converter, usd_mesh):
                 normals = []
                 if usd_mesh.GetNormalsInterpolation() == "faceVarying":
                     n = _get_triangulated_attribute(
-                        faces, rawNormals, is_index=True, isLeftHanded=isLeftHanded
+                        faces, rawNormals, is_index=True, isLeftHanded=isLeftHanded 
                     )
                     normals = [n[int(x)] for x in sub_tri_indices]
                 elif usd_mesh.GetNormalsInterpolation() == "vertex":
@@ -289,7 +289,7 @@ def convert(converter, usd_mesh):
                     tex_idx = 0
 
                     if stCoords.IsDefined():
-                        rawUVS = common._GetStaticValue(stCoords)
+                        rawUVS = common._GetFlattenedStaticValue(stCoords)
 
                         start_byte_len = len(converter.maindata_bytearray)
                         uvs = []
@@ -361,6 +361,11 @@ def convert(converter, usd_mesh):
 
                     elif "vertex" in displayColor.GetInterpolation():
                         convertedColors = [rawColors[int(x)] for x in sub_index_array]
+
+                    elif "uniform" in displayColor.GetInterpolation():
+                        rawColors = common._GetFlattenedStaticValue(displayColor)
+                        convertedColors = [rawColors[int(x)] for x in sub_index_array]
+
                     convertedColors = np.array(convertedColors, "float32")
                     convertedColors = convertedColors.reshape(
                         -1, convertedColors.shape[-1]
