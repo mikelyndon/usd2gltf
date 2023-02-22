@@ -436,7 +436,7 @@ def convert(converter, usd_mesh):
                                 subset_mat_id
                             ].doubleSided = isDoubleSided
 
-                    primitives[s].material = subset_mat_id
+                    primitives[sub_idx].material = subset_mat_id
             except Exception:
                 pass
 
