@@ -2,7 +2,29 @@
 
 USD to GLTF/GLB converter
 
-Current version `0.3.4`
+Current version `0.3.5`
+
+## Usage
+
+This package can be incorporated into a DCC tool (like Houdini) or used from the command-line.
+
+### CLI
+
+usage: usd2gltf [-h] [-i INPUT] [-o OUTPUT] [--interpolation INTERPOLATION] [-d] [-f]
+
+Convert incoming USD(z) file to glTF/glb
+
+optional arguments:
+
+- -h, --help show this help message and exit
+- -i INPUT, --input INPUT
+  - Input USD (.usd, .usdc, .usda, .usdz)
+- -o OUTPUT, --output OUTPUT
+  - Output glTF (.gltf, .glb)
+- --interpolation INTERPOLATION
+  - Interpolation of animation (LINEAR, STEP, CUBIC)
+- -d, --debug Run in debug mode
+- -f, --flatten Flatten all animations into one animation
 
 ## Requirements
 
@@ -19,9 +41,6 @@ Current version `0.3.4`
   - Normals and tangents supported
 - Materials
   - UsdPreviewSurface -> PBRMetallicRoughness
-- Point Instancer
-  - Creates many objects to one mesh, not true gltf instancing
-  - Animated TRS supported
 - Camera conversion
 - Light conversion
   - Point
