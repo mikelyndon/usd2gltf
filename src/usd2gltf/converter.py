@@ -217,9 +217,9 @@ class Converter:
 
         # TODO: Is this being used?
         # Unzip all sublayers
-        for i, l in enumerate(self.stage.GetRootLayer().subLayerPaths):
-            if "usdz" in l:
-                new_path = self.localize_zip(str(l))
+        for i, l in enumerate(self.stage.GetRootLayer().GetLoadedLayers()):
+            if "usdz" in l.realPath:
+                new_path = self.localize_zip(str(l.realPath))
                 self.stage = Usd.Stage.Open(new_path)
                 break
 
