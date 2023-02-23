@@ -220,6 +220,8 @@ class Converter:
         for i, l in enumerate(self.stage.GetRootLayer().subLayerPaths):
             if "usdz" in l:
                 new_path = self.localize_zip(str(l))
+                self.stage = Usd.Stage.Open(new_path)
+                break
 
         self.FPS = self.stage.GetFramesPerSecond()
 
