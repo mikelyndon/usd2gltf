@@ -215,11 +215,13 @@ class Converter:
 
         self.stage = stage
 
-        # TODO: Is this being used?
-        # Unzip all sublayers
-        for i, l in enumerate(self.stage.GetRootLayer().subLayerPaths):
-            if "usdz" in l:
-                new_path = self.localize_zip(str(l))
+        # TODO: If there are multiple usdz files, we probably need to recreate the stage. 
+        # Unzip first sublayer that is a usdz file
+        for i, l in enumerate(self.stage.GetRootLayer().GetLoadedLayers()):
+            if "usdz" in l.realPath:
+                new_path = self.localize_zip(str(l.realPath))
+                self.stage = Usd.Stage.Open(new_path)
+                break
 
         self.FPS = self.stage.GetFramesPerSecond()
 
