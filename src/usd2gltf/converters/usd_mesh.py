@@ -412,7 +412,7 @@ def convert(converter, usd_mesh):
 
         # Set material for subset
         # Skip this while figuring out the points and indices basics.
-        for sub in subsets:
+        for sub_idx, sub in enumerate(subsets):
             try:
                 mat_api = UsdShade.MaterialBindingAPI(sub)
                 mat_path = mat_api.ComputeBoundMaterial()[0].GetPath()
